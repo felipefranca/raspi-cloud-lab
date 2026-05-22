@@ -1,0 +1,24 @@
+version: '3.8' # Opcional, mas ajuda a definir a versão do compose
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+# A definição global dos volumes fica na raiz do arquivo:
+volumes:
+  postgres_data:
