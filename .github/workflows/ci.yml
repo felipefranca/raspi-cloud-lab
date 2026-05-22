@@ -14,7 +14,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - name: Build
+      - name: Build and Clean With Maven
         run: mvn clean package -DskipTests
       - name: Login Docker Hub
         uses: docker/login-action@v3
@@ -23,5 +23,5 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }} 
       - name: Build Image
         run: docker build -t felipejofranca/cloud-learn:latest . 
-          - name: Push Image
-          run: docker push felipejofranca/cloud-learn:latest
+      - name: Push Image
+        run: docker push felipejofranca/cloud-learn:latest
