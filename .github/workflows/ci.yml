@@ -23,6 +23,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }} 
       - name: Build Image
-        run: docker build -t felipejofranca/cloud-learn:latest . 
+        run: docker buildx build --platform linux/amd64,linux/arm64 -t felipejofranca/cloud-learn:latest --push .
       - name: Push Image
         run: docker push felipejofranca/cloud-learn:latest
