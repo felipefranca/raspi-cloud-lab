@@ -169,6 +169,10 @@ Solução: remover a plataforma não suportada do `buildx` ou usar uma base comp
 
 ![btop](docs/images/btop.png)
 
+### 4) Teste de POST no Postman
+
+![Postman POST](docs/images/postman.png)
+
 ## Licença
 
 Defina a licença que preferir (`MIT`, por exemplo) antes de publicar.
