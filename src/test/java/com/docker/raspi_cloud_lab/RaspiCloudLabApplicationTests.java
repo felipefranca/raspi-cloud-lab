@@ -1,10 +1,10 @@
-package com.docker.cloud_learn;
+package com.docker.raspi_cloud_lab;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CloudLearnApplicationTests {
+class RaspiCloudLabApplicationTests {
 
 	@Test
 	void contextLoads() {

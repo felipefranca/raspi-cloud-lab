@@ -1,4 +1,4 @@
-package com.docker.cloud_learn;
+package com.docker.raspi_cloud_lab;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

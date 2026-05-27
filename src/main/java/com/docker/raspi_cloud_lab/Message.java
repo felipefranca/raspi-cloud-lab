@@ -1,4 +1,4 @@
-package com.docker.cloud_learn;
+package com.docker.raspi_cloud_lab;
 
 import jakarta.persistence.*;
 

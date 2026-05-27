@@ -5,7 +5,7 @@ on:
       - master
 jobs:
   build:
-    environment: cloud-learn-secrets
+    environment: raspi-cloud-lab-secrets
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,8 +30,8 @@ jobs:
           context: .
           push: true
           tags: |
-            felipejofranca/cloud-learn:latest
-            felipejofranca/cloud-learn:${{ github.sha }}
+            felipejofranca/raspi-cloud-lab:latest
+            felipejofranca/raspi-cloud-lab:${{ github.sha }}
           platforms: linux/amd64,linux/arm64
 
   deploy:
@@ -40,21 +40,21 @@ jobs:
     runs-on: [self-hosted, linux, arm64]
     steps:
       - name: Pull immutable image tag
-        run: docker pull felipejofranca/cloud-learn:${{ github.sha }}
+        run: docker pull felipejofranca/raspi-cloud-lab:${{ github.sha }}
 
       - name: Stop and remove previous container
         run: |
-          docker stop cloud-learn || true
-          docker rm cloud-learn || true
+          docker stop raspi-cloud-lab || true
+          docker rm raspi-cloud-lab || true
 
       - name: Run updated container
         run: |
           docker run -d \
-            --name cloud-learn \
+            --name raspi-cloud-lab \
             --restart unless-stopped \
             --network cloud-network \
             -p 8080:8080 \
             -e spring.datasource.url="jdbc:postgresql://postgres:5432/appdb" \
             -e spring.datasource.username="admin" \
             -e spring.datasource.password="admin" \
-            felipejofranca/cloud-learn:${{ github.sha }}
+            felipejofranca/raspi-cloud-lab:${{ github.sha }}

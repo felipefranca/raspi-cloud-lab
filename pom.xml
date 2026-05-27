@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.docker</groupId>
-	<artifactId>cloud-learn</artifactId>
+	<artifactId>raspi-cloud-lab</artifactId>
 	<version>1.0.1</version>
-	<name/>
-	<description/>
+	<name>raspi-cloud-lab</name>
+	<description>Cloud learning lab with Raspberry Pi self-hosted runner and automated Docker deploy.</description>
 	<url/>
 	<licenses>
 		<license/>

@@ -1,4 +1,4 @@
-package com.docker.cloud_learn;
+package com.docker.raspi_cloud_lab;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

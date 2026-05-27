@@ -2,7 +2,9 @@ version: '3.8' # Opcional, mas ajuda a definir a versão do compose
 
 services:
   app:
+    container_name: raspi-cloud-lab
     build: .
+    image: felipejofranca/raspi-cloud-lab:latest
     ports:
       - "8080:8080"
     depends_on:
