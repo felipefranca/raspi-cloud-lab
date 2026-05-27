@@ -5,7 +5,7 @@ on:
       - master
 jobs:
   build:
-    environment: raspi-cloud-lab-secrets
+    environment: cloud-learn-secrets
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
