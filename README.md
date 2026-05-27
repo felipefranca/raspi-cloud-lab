@@ -4,12 +4,26 @@ Laboratório prático para aprender Cloud com uma API Java (Spring Boot), Docker
 
 ## Objetivo
 
+O foco deste projeto é aprender CI/CD na forma mais pura, usando um cenário real de homelab com hardware simples.
+Em vez de infraestrutura gerenciada em cloud pública, o ciclo inteiro roda em uma Raspberry Pi de uso pessoal para mostrar como publicar, atualizar e operar um sistema fim a fim.
+
 Este projeto demonstra um fluxo completo de CI/CD:
 
 1. Build da aplicação Java com Maven
 2. Build e push de imagem Docker multi-arquitetura (`amd64` + `arm64`)
 3. Deploy automático na Raspberry Pi (self-hosted runner)
 4. Atualização do container com tag imutável por commit (`github.sha`)
+
+## Escopo do Lab (Tudo na mesma Raspberry)
+
+Neste laboratório, a mesma Raspberry Pi hospeda os componentes principais:
+
+1. Aplicação (`raspi-cloud-lab`)
+2. Banco PostgreSQL
+3. Portainer (gestão visual dos containers)
+4. GitHub Actions Runner self-hosted (job de deploy)
+
+Isso reforça o objetivo didático: entender o ciclo CI/CD completo em ambiente simples, controlado e caseiro.
 
 ## Arquitetura
 
