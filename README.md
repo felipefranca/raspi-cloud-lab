@@ -187,6 +187,16 @@ Solução: remover a plataforma não suportada do `buildx` ou usar uma base comp
 
 ![Postman POST](docs/images/postman.png)
 
+## Hardware (Raspberry Pi)
+
+### Raspberry Pi aberta
+
+![Raspberry aberta](docs/images/raspberry-open.jpeg)
+
+### Raspberry Pi fechada
+
+![Raspberry fechada](docs/images/raspberry-closed.jpeg)
+
 ## Licença
 
 Defina a licença que preferir (`MIT`, por exemplo) antes de publicar.
