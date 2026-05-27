@@ -157,35 +157,17 @@ Solução: remover a plataforma não suportada do `buildx` ou usar uma base comp
 
 ## Evidências (prints)
 
-Salve as capturas em `docs/images/` com os nomes abaixo.
+### 1) Workflow com deploy em sucesso
 
-### 1) Runner registrado
+![Workflow success](docs/images/workflow-sucess.png)
 
-![Runner registrado](docs/images/01-runner-registration.png)
+### 2) Container em execução no Portainer
 
-### 2) Runner como serviço (systemd)
+![Portainer](docs/images/portainer.png)
 
-![Runner systemd](docs/images/02-runner-systemd-status.png)
+### 3) Monitoramento da Raspberry com btop
 
-### 3) Workflow executando deploy
-
-![Workflow deploy running](docs/images/03-workflow-deploy-running.png)
-
-### 4) Workflow com sucesso
-
-![Workflow success](docs/images/04-workflow-success.png)
-
-### 5) Portainer com container atualizado
-
-![Portainer container list](docs/images/05-portainer-container-list.png)
-
-### 6) Detalhes do container no Portainer
-
-![Portainer container details](docs/images/06-portainer-container-details.png)
-
-### 7) Monitoramento na Raspberry (btop)
-
-![Raspberry btop](docs/images/07-raspberry-btop.png)
+![btop](docs/images/btop.png)
 
 ## Licença
 
