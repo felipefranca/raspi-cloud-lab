@@ -32,6 +32,7 @@ Este projeto demonstra um fluxo completo de CI/CD:
 - Docker
 - GitHub Actions
 - Raspberry Pi 3 (aarch64 / arm64)
+- Tailscale (conectividade segura entre máquinas)
 
 ## Estrutura principal
 
@@ -43,22 +44,51 @@ Este projeto demonstra um fluxo completo de CI/CD:
 ## Pré-requisitos
 
 1. Docker instalado na Raspberry
+2. Tailscale instalado e autenticado:
+   - máquina de desenvolvimento
+   - Raspberry Pi
+3. Ambas as máquinas na mesma tailnet
 2. Rede Docker criada:
 
 ```bash
 docker network create cloud-network
 ```
 
-3. Banco PostgreSQL acessível na mesma rede:
+4. Banco PostgreSQL acessível na mesma rede:
    - host: `postgres`
    - port: `5432`
    - db: `appdb`
    - user: `admin`
    - password: `admin`
-4. Runner self-hosted configurado no repositório com labels:
+5. Runner self-hosted configurado no repositório com labels:
    - `self-hosted`
    - `linux`
    - `arm64`
+
+## Rede (Tailscale)
+
+Neste laboratório, usamos Tailscale nas duas máquinas para acesso remoto seguro:
+
+1. Notebook/desktop de desenvolvimento conectado à tailnet
+2. Raspberry Pi conectada à mesma tailnet
+3. Hostname da Raspberry acessível por nome MagicDNS, por exemplo:
+   - `raspberry-server`
+
+Exemplos de acesso:
+
+```bash
+ssh raspberry_adm@raspberry-server
+```
+
+```text
+http://raspberry-server:8080/api/v1/messages
+```
+
+Benefícios no projeto:
+
+1. Não expor SSH/publicação diretamente na internet
+2. Acesso estável por hostname, sem depender de IP local dinâmico
+3. Facilidade para operar deploy, logs e validações remotamente
 
 ## Pipeline (GitHub Actions)
 
