@@ -29,5 +29,32 @@ jobs:
         with:
           context: .
           push: true
-          tags: felipejofranca/cloud-learn:latest
+          tags: |
+            felipejofranca/cloud-learn:latest
+            felipejofranca/cloud-learn:${{ github.sha }}
           platforms: linux/amd64,linux/arm64
+
+  deploy:
+    name: Deploy on Raspberry
+    needs: build
+    runs-on: [self-hosted, linux, arm64]
+    steps:
+      - name: Pull immutable image tag
+        run: docker pull felipejofranca/cloud-learn:${{ github.sha }}
+
+      - name: Stop and remove previous container
+        run: |
+          docker stop cloud-learn || true
+          docker rm cloud-learn || true
+
+      - name: Run updated container
+        run: |
+          docker run -d \
+            --name cloud-learn \
+            --restart unless-stopped \
+            --network cloud-network \
+            -p 8080:8080 \
+            -e spring.datasource.url="jdbc:postgresql://postgres:5432/appdb" \
+            -e spring.datasource.username="admin" \
+            -e spring.datasource.password="admin" \
+            felipejofranca/cloud-learn:${{ github.sha }}
