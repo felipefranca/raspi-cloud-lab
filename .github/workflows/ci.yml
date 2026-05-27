@@ -44,6 +44,8 @@ jobs:
 
       - name: Stop and remove previous container
         run: |
+          docker stop cloud-learn || true
+          docker rm cloud-learn || true
           docker stop raspi-cloud-lab || true
           docker rm raspi-cloud-lab || true
 
