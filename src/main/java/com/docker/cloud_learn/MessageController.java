@@ -30,6 +30,6 @@ public class MessageController {
     @GetMapping("/hello")
     public String sayHello() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        return "Hello! " + LocalDateTime.now().format(formatter);
+        return "Hello mother fucker! " + LocalDateTime.now().format(formatter);
     }
 }
