@@ -33,9 +33,4 @@ public class MessageController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    @GetMapping("/hello")
-    public String sayHello() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        return "Hello mother fucker! " + LocalDateTime.now().format(formatter);
-    }
 }
