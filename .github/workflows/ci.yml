@@ -39,11 +39,20 @@ jobs:
     needs: build
     runs-on: [self-hosted, linux, arm64]
     steps:
-      - name: Validate USB storage directories
+      - name: Prepare and validate USB storage directories
         run: |
+          set -e
           test -d /data || { echo "ERROR: /data not found. Mount the USB drive at /data."; exit 1; }
-          test -w /data || { echo "ERROR: runner user has no write permission in /data. Run once: sudo mkdir -p /data/volumes /data/logs /data/backups && sudo chown -R raspberry_adm:raspberry_adm /data/volumes /data/logs /data/backups"; exit 1; }
-          mkdir -p /data/volumes/raspi-cloud-lab /data/logs/raspi-cloud-lab /data/backups
+
+          if command -v sudo >/dev/null 2>&1; then
+            sudo mkdir -p /data/volumes/raspi-cloud-lab /data/logs/raspi-cloud-lab /data/backups /data/postgresql
+            sudo chown -R raspberry_adm:raspberry_adm /data/volumes /data/logs /data/backups
+          else
+            mkdir -p /data/volumes/raspi-cloud-lab /data/logs/raspi-cloud-lab /data/backups /data/postgresql
+          fi
+
+          test -w /data/volumes/raspi-cloud-lab || { echo "ERROR: no write permission in /data/volumes/raspi-cloud-lab"; exit 1; }
+          test -w /data/logs/raspi-cloud-lab || { echo "ERROR: no write permission in /data/logs/raspi-cloud-lab"; exit 1; }
 
       - name: Pull immutable image tag
         run: docker pull felipejofranca/raspi-cloud-lab:${{ github.sha }}
