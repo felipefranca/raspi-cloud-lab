@@ -16,19 +16,20 @@ import java.util.List;
 public class MessageController {
 
     private static final Logger log = LoggerFactory.getLogger(MessageController.class);
+
     @Autowired
-    private MessageRepository repository;
+    private MessageService service;
 
     @GetMapping
     public List<Message> hello() {
-        log.info("Todas as mensagens recuperadas");
-        return repository.findAll();
+        log.info("[Controller] - Recuperando todas as mensagens");
+        return service.findAll();
     }
 
     @PostMapping
     public ResponseEntity<Message> save(@RequestBody Message message) {
-        var result = repository.save(message);
-        log.info("Mensagem criada");
+        var result = service.save(message);
+        log.info("[Controller] - Mensagem criada");
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
