@@ -1,4 +1,4 @@
-version: '3.8' # Opcional, mas ajuda a definir a versão do compose
+version: '3.8'
 
 services:
   app:
@@ -7,6 +7,11 @@ services:
     image: felipejofranca/raspi-cloud-lab:latest
     ports:
       - "8080:8080"
+    volumes:
+      - /data/volumes/raspi-cloud-lab:/app/data
+      - /data/logs/raspi-cloud-lab:/app/logs
+    environment:
+      LOGGING_FILE_PATH: /app/logs
     depends_on:
       - postgres
 
@@ -19,8 +24,5 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-# A definição global dos volumes fica na raiz do arquivo:
-volumes:
-  postgres_data:
+      - /data/postgresql:/var/lib/postgresql/data
+      - /data/backups:/backups

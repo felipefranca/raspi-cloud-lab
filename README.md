@@ -55,6 +55,29 @@ Isso reforça o objetivo didático: entender o ciclo CI/CD completo em ambiente 
 - `src/main/java/com/docker/raspi_cloud_lab`
 - `src/main/resources/application.properties`
 
+## Armazenamento na Raspberry (`/data`)
+
+Para reduzir escrita no SD Card, os dados persistentes foram movidos para pendrive montado em `/data`:
+
+- `/data/postgresql`: dados do PostgreSQL
+- `/data/volumes/raspi-cloud-lab`: volume de dados da aplicação
+- `/data/logs/raspi-cloud-lab`: logs da aplicação
+- `/data/backups`: backups
+
+Estrutura:
+
+```text
+SD Card (14 GB)
+├── Raspberry OS
+└── Configurações
+
+Pendrive (59 GB)
+├── PostgreSQL
+├── Volumes Docker
+├── Logs
+└── Backups
+```
+
 ## Pré-requisitos
 
 1. Docker instalado na Raspberry
@@ -115,6 +138,7 @@ Arquivo: `.github/workflows/ci.yml`
 - Job `deploy`:
   - executa na Raspberry
   - baixa imagem da tag SHA
+  - garante diretórios em `/data`
   - recria container `raspi-cloud-lab`
 
 ## Variáveis de ambiente da aplicação
@@ -138,9 +162,12 @@ docker run -d \
   --restart unless-stopped \
   --network cloud-network \
   -p 8080:8080 \
+  -v /data/volumes/raspi-cloud-lab:/app/data \
+  -v /data/logs/raspi-cloud-lab:/app/logs \
   -e spring.datasource.url="jdbc:postgresql://postgres:5432/appdb" \
   -e spring.datasource.username="admin" \
   -e spring.datasource.password="admin" \
+  -e logging.file.path="/app/logs" \
   felipejofranca/raspi-cloud-lab:latest
 ```
 
