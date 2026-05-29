@@ -122,6 +122,8 @@ jobs:
         run: |
           docker stop cloud-learn || true
           docker rm cloud-learn || true
+          docker stop postgres || true
+          docker rm postgres || true
 
       - name: Pull and deploy with Docker Compose
         run: |
