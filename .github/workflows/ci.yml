@@ -1,44 +1,93 @@
 name: CI Pipeline
+
 on:
   push:
     branches:
       - master
+      - staging
+      - develop
+      - development
+
 jobs:
   build:
     environment: cloud-learn-secrets
     runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.version.outputs.app_version }}
+      image_tags: ${{ steps.tags.outputs.tags }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
+
       - name: Build and Clean With Maven
         run: mvn clean package -DskipTests
+
+      - name: Read app version from pom.xml
+        id: version
+        run: |
+          APP_VERSION=$(grep -m1 "<version>" pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
+          echo "app_version=$APP_VERSION" >> "$GITHUB_OUTPUT"
+          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
+
+      - name: Prepare image tags
+        id: tags
+        env:
+          IMAGE_NAME: felipejofranca/raspi-cloud-lab
+        run: |
+          TAGS="$IMAGE_NAME:sha-${GITHUB_SHA}"
+          TAGS="$TAGS"$'\n'"$IMAGE_NAME:${APP_VERSION}"
+
+          case "${GITHUB_REF_NAME}" in
+            master)
+              TAGS="$TAGS"$'\n'"$IMAGE_NAME:latest"
+              TAGS="$TAGS"$'\n'"$IMAGE_NAME:production"
+              ;;
+            staging)
+              TAGS="$TAGS"$'\n'"$IMAGE_NAME:stage"
+              ;;
+            develop|development)
+              TAGS="$TAGS"$'\n'"$IMAGE_NAME:development"
+              ;;
+          esac
+
+          {
+            echo "tags<<EOF"
+            echo "$TAGS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Login Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Setup Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Build and Push Multi-Arch Image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: |
-            felipejofranca/raspi-cloud-lab:latest
-            felipejofranca/raspi-cloud-lab:${{ github.sha }}
+          tags: ${{ steps.tags.outputs.tags }}
           platforms: linux/amd64,linux/arm64
 
   deploy:
     name: Deploy on Raspberry
+    if: github.ref_name == 'master'
     needs: build
     runs-on: [self-hosted, linux, arm64]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Prepare and validate USB storage directories
         run: |
           set -e
@@ -47,6 +96,7 @@ jobs:
           if command -v sudo >/dev/null 2>&1; then
             sudo mkdir -p /data/volumes/raspi-cloud-lab /data/logs/raspi-cloud-lab /data/backups /data/postgresql
             sudo chown -R raspberry_adm:raspberry_adm /data/volumes /data/logs /data/backups
+            sudo chown -R 999:999 /data/postgresql
           else
             mkdir -p /data/volumes/raspi-cloud-lab /data/logs/raspi-cloud-lab /data/backups /data/postgresql
           fi
@@ -54,27 +104,26 @@ jobs:
           test -w /data/volumes/raspi-cloud-lab || { echo "ERROR: no write permission in /data/volumes/raspi-cloud-lab"; exit 1; }
           test -w /data/logs/raspi-cloud-lab || { echo "ERROR: no write permission in /data/logs/raspi-cloud-lab"; exit 1; }
 
-      - name: Pull immutable image tag
-        run: docker pull felipejofranca/raspi-cloud-lab:${{ github.sha }}
+      - name: Ensure cloud-network exists
+        run: |
+          docker network inspect cloud-network >/dev/null 2>&1 || docker network create cloud-network
 
-      - name: Stop and remove previous container
+      - name: Write deployment env file
+        run: |
+          cat > .env <<EOF
+          IMAGE_TAG=sha-${GITHUB_SHA}
+          POSTGRES_DB=appdb
+          POSTGRES_USER=admin
+          POSTGRES_PASSWORD=admin
+          EOF
+
+      - name: Remove legacy standalone containers
         run: |
           docker stop cloud-learn || true
           docker rm cloud-learn || true
-          docker stop raspi-cloud-lab || true
-          docker rm raspi-cloud-lab || true
 
-      - name: Run updated container
+      - name: Pull and deploy with Docker Compose
         run: |
-          docker run -d \
-            --name raspi-cloud-lab \
-            --restart unless-stopped \
-            --network cloud-network \
-            -p 8080:8080 \
-            -v /data/volumes/raspi-cloud-lab:/app/data \
-            -v /data/logs/raspi-cloud-lab:/app/logs \
-            -e spring.datasource.url="jdbc:postgresql://postgres:5432/appdb" \
-            -e spring.datasource.username="admin" \
-            -e spring.datasource.password="admin" \
-            -e logging.file.path="/app/logs" \
-            felipejofranca/raspi-cloud-lab:${{ github.sha }}
+          docker compose pull
+          docker compose up -d --remove-orphans
+

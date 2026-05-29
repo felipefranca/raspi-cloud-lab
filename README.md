@@ -11,7 +11,7 @@ Este projeto demonstra um fluxo completo de CI/CD:
 
 1. Build da aplicação Java com Maven
 2. Build e push de imagem Docker multi-arquitetura (`amd64` + `arm64`)
-3. Deploy automático na Raspberry Pi (self-hosted runner)
+3. Deploy automático na Raspberry Pi (self-hosted runner) com Docker Compose
 4. Atualização do container com tag imutável por commit (`github.sha`)
 
 ## Escopo do Lab (Tudo na mesma Raspberry)
@@ -29,14 +29,18 @@ Isso reforça o objetivo didático: entender o ciclo CI/CD completo em ambiente 
 
 1. `push` na branch `master`
 2. GitHub Actions executa job `build` no `ubuntu-latest`
-3. Imagem é publicada no Docker Hub:
-   - `felipejofranca/raspi-cloud-lab:latest`
-   - `felipejofranca/raspi-cloud-lab:<sha-do-commit>`
+3. Imagem é publicada no Docker Hub com tags por ambiente e versão:
+   - `felipejofranca/raspi-cloud-lab:sha-<commit>`
+   - `felipejofranca/raspi-cloud-lab:<versao-semver>`
+   - `felipejofranca/raspi-cloud-lab:development` (branch `develop`/`development`)
+   - `felipejofranca/raspi-cloud-lab:stage` (branch `staging`)
+   - `felipejofranca/raspi-cloud-lab:production` e `latest` (branch `master`)
 4. Job `deploy` roda na Raspberry (`self-hosted`, `linux`, `arm64`)
 5. Runner faz:
-   - `docker pull` da tag SHA
-   - `docker stop/rm` do container antigo
-   - `docker run` com variáveis de ambiente e rede `cloud-network`
+   - valida diretórios persistentes em `/data`
+   - prepara `.env` com a tag `sha-<commit>`
+   - `docker compose pull`
+   - `docker compose up -d --remove-orphans`
 
 ## Stack
 
@@ -136,10 +140,11 @@ Arquivo: `.github/workflows/ci.yml`
   - login no Docker Hub
   - build/push multi-arch (`linux/amd64,linux/arm64`)
 - Job `deploy`:
-  - executa na Raspberry
-  - baixa imagem da tag SHA
+  - executa na Raspberry (somente na branch `master`)
   - garante diretórios em `/data`
-  - recria container `raspi-cloud-lab`
+  - garante rede `cloud-network`
+  - sobe/atualiza app e banco com `docker compose`
+  - mantém dados persistidos em `/data/postgresql`
 
 ## Variáveis de ambiente da aplicação
 
