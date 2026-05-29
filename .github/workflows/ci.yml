@@ -93,13 +93,14 @@ jobs:
           set -e
           test -d /data || { echo "ERROR: /data not found. Mount the USB drive at /data."; exit 1; }
 
-          if command -v sudo >/dev/null 2>&1; then
-            sudo mkdir -p /data/volumes/raspi-cloud-lab /data/logs/raspi-cloud-lab /data/backups /data/postgresql
-            sudo chown -R raspberry_adm:raspberry_adm /data/volumes /data/logs /data/backups
-            sudo chown -R 999:999 /data/postgresql
-          else
-            mkdir -p /data/volumes/raspi-cloud-lab /data/logs/raspi-cloud-lab /data/backups /data/postgresql
-          fi
+          mkdir -p /data/volumes/raspi-cloud-lab /data/logs/raspi-cloud-lab /data/backups /data/postgresql || {
+            echo "ERROR: unable to create folders in /data with runner permissions."
+            echo "Run once on Raspberry:"
+            echo "sudo mkdir -p /data/volumes/raspi-cloud-lab /data/logs/raspi-cloud-lab /data/backups /data/postgresql"
+            echo "sudo chown -R raspberry_adm:raspberry_adm /data/volumes /data/logs /data/backups"
+            echo "sudo chown -R 999:999 /data/postgresql"
+            exit 1
+          }
 
           test -w /data/volumes/raspi-cloud-lab || { echo "ERROR: no write permission in /data/volumes/raspi-cloud-lab"; exit 1; }
           test -w /data/logs/raspi-cloud-lab || { echo "ERROR: no write permission in /data/logs/raspi-cloud-lab"; exit 1; }
@@ -126,4 +127,3 @@ jobs:
         run: |
           docker compose pull
           docker compose up -d --remove-orphans
-
